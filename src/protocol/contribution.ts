@@ -28,15 +28,51 @@ export interface Contributions {
 }
 
 /**
+ * A special command (for use in CommandContribution#command or
+ * CommandContribution#alternateCommand) that causes the first argument to be passed to the default
+ * URL handler to open a URL, instead of the command being invoked on the extension.
+ */
+export const OPEN_COMMAND_ID = 'open'
+
+/**
  * CommandContribution is a command provided by the extension that can be invoked.
  */
 export interface CommandContribution {
     /**
-     * Command is an identifier for the command that is assumed to be unique. If another command with the same
-     * identifier is defined (by this extension or another extension), the behavior is undefined. To avoid
-     * collisions, the identifier conventionally is prefixed with "${EXTENSION_NAME}.".
+     * Command is an identifier for the command that is assumed to be unique. If another command
+     * with the same identifier is defined (by this extension or another extension), the behavior is
+     * undefined. To avoid collisions, the identifier conventionally is prefixed with
+     * "${EXTENSION_NAME}.".
+     *
+     * The special command "open" can be used to open a URL (specified as a string in the first
+     * element of commandArguments) using the default URL handler on the client, instead of invoking
+     * the command on the extension.
+     *
+     * Client: If the command is "open", the client should treat the first element of
+     * commandArguments as a URL to open with the default URL handler (instead of sending a request
+     * to the extension to execute this command).
      */
-    command: string
+    command: string | typeof OPEN_COMMAND_ID
+
+    /**
+     * Optional arguments to pass to the extension when the command is invoked.
+     */
+    commandArguments?: any[]
+
+    /**
+     * An alternate command to invoke when the user triggers this command with a secondary input
+     * action (such as Ctrl+Enter/Cmd+Enter or middle click).
+     *
+     * Clients: Invoke this command instead of the primary command when the user: (1) presses
+     * Ctrl+Enter/Cmd+Enter when this item is selected in a list or (2) clicks the middle mouse
+     * button on this item when it is displayed on a toolbar.
+     */
+    alternateCommand?: string
+
+    /**
+     * Optional arguments to pass to the extension when the alternate command is invoked.
+     */
+    alternateCommandArguments?: any[]
 
     /** The title that succinctly describes the action taken by this command. */
     title?: string
