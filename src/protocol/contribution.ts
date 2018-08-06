@@ -34,10 +34,8 @@ export interface Contributions {
  */
 export const OPEN_COMMAND_ID = 'open'
 
-/**
- * CommandContribution is a command provided by the extension that can be invoked.
- */
-export interface CommandContribution {
+/** A command and alternate command with arguments. */
+export interface CommandItem {
     /**
      * Command is an identifier for the command that is assumed to be unique. If another command
      * with the same identifier is defined (by this extension or another extension), the behavior is
@@ -67,13 +65,18 @@ export interface CommandContribution {
      * Ctrl+Enter/Cmd+Enter when this item is selected in a list or (2) clicks the middle mouse
      * button on this item when it is displayed on a toolbar.
      */
-    alternateCommand?: string
+    alternateCommand?: string | typeof OPEN_COMMAND_ID
 
     /**
      * Optional arguments to pass to the extension when the alternate command is invoked.
      */
     alternateCommandArguments?: any[]
+}
 
+/**
+ * CommandContribution is a command provided by the extension that can be invoked.
+ */
+export interface CommandContribution extends CommandItem {
     /** The title that succinctly describes the action taken by this command. */
     title?: string
 
@@ -116,46 +119,49 @@ export interface CommandContribution {
      * Clients: If the label is empty and only an iconURL is set, and the client decides not to display the icon
      * (e.g., because the client is not graphical), then the client may hide the item from the toolbar.
      */
-    toolbarItem?: {
-        /** The text label for this command when displayed on a toolbar. */
-        label?: string
+    toolbarItem?: ToolbarItem
+}
 
-        /**
-         * A description associated with this toolbar item.
-         *
-         * Clients: The description should be shown in a tooltip when the user focuses or hovers this toolbar item.
-         */
-        description?: string
+/** An item displayed on a toolbar. */
+export interface ToolbarItem {
+    /** The text label for this command when displayed on a toolbar. */
+    label?: string
 
-        /**
-         * The group in the toolbar where this command's toolbar item is displayed. This defines the sort order of
-         * toolbar items. The group value is an opaque string (it is just compared relative to other toolbar items'
-         * group values); there is no specification set of expected or supported values.
-         *
-         * Clients: On a toolbar, the client should sort toolbar items by (group, command), with toolbar items
-         * lacking a group sorting last. The client must not display the group value.
-         */
-        group?: string
+    /**
+     * A description associated with this toolbar item.
+     *
+     * Clients: The description should be shown in a tooltip when the user focuses or hovers this toolbar item.
+     */
+    description?: string
 
-        /**
-         * The icon URL for this command when displayed on a toolbar (data: URIs are OK).
-         *
-         * Clients: The client should this icon before the label (if any), proportionally scaling the dimensions as
-         * necessary to avoid unduly enlarging the toolbar item beyond the dimensions necessary to show the label.
-         * In space-constrained situations, the client should show only the icon and omit the label. The client
-         * must not display a border around the icon. The client may choose not to display this icon.
-         */
-        iconURL?: string
+    /**
+     * The group in the toolbar where this command's toolbar item is displayed. This defines the sort order of
+     * toolbar items. The group value is an opaque string (it is just compared relative to other toolbar items'
+     * group values); there is no specification set of expected or supported values.
+     *
+     * Clients: On a toolbar, the client should sort toolbar items by (group, command), with toolbar items
+     * lacking a group sorting last. The client must not display the group value.
+     */
+    group?: string
 
-        /**
-         * A description of the information represented by the icon.
-         *
-         * Clients: The client should not display this text directly. Instead, the client should use the
-         * accessibility facilities of the client's platform (such as the <img alt> attribute) to make it available
-         * to users needing the textual description.
-         */
-        iconDescription?: string
-    }
+    /**
+     * The icon URL for this command when displayed on a toolbar (data: URIs are OK).
+     *
+     * Clients: The client should this icon before the label (if any), proportionally scaling the dimensions as
+     * necessary to avoid unduly enlarging the toolbar item beyond the dimensions necessary to show the label.
+     * In space-constrained situations, the client should show only the icon and omit the label. The client
+     * must not display a border around the icon. The client may choose not to display this icon.
+     */
+    iconURL?: string
+
+    /**
+     * A description of the information represented by the icon.
+     *
+     * Clients: The client should not display this text directly. Instead, the client should use the
+     * accessibility facilities of the client's platform (such as the <img alt> attribute) to make it available
+     * to users needing the textual description.
+     */
+    iconDescription?: string
 }
 
 export enum ContributableMenu {

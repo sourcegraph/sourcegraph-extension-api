@@ -1,4 +1,5 @@
 import { Range, TextDocumentIdentifier } from 'vscode-languageserver-types'
+import { CommandItem, ToolbarItem } from '../extension'
 import { NotificationHandler, RequestHandler } from '../jsonrpc2/handlers'
 import { NotificationType, RequestType } from '../jsonrpc2/messages'
 import { TextDocumentRegistrationOptions } from './textDocument'
@@ -99,4 +100,47 @@ export namespace TextDocumentPublishDecorationsNotification {
         'textDocument/publishDecorations'
     )
     export type HandlerSignature = NotificationHandler<TextDocumentPublishDecorationsParams>
+}
+
+/**
+ * A resource decoration changes the appearance of a resource (other than a text document).
+ */
+export interface ResourceDecoration {
+    /** The CSS color property value for the resource's title. */
+    color?: string
+
+    /**
+     * If there are multiple decorations that conflict for a resource, decorations with a higher
+     * priority (larger number) take precedence.
+     */
+    priority?: number
+
+    /** An optional item to display near the resource's title. */
+    item?: CommandItem & ToolbarItem
+}
+
+export interface ResourceDecorationParams {
+    textDocument: ResourceIdentifier
+}
+
+export namespace ResourceDecorationRequest {
+    export const type = new RequestType<
+        ResourceDecorationParams,
+        ResourceDecoration[] | null,
+        void,
+        ResourceRegistrationOptions
+    >('resource/decoration')
+    export type HandlerSignature = RequestHandler<ResourceDecorationParams, ResourceDecoration[] | null, void>
+}
+
+export interface ResourcePublishDecorationsParams {
+    textDocument: ResourceIdentifier
+    decorations: ResourceDecoration[] | null
+}
+
+export namespace ResourcePublishDecorationsNotification {
+    export const type = new NotificationType<ResourcePublishDecorationsParams, ResourceRegistrationOptions>(
+        'textDocument/publishDecorations'
+    )
+    export type HandlerSignature = NotificationHandler<ResourcePublishDecorationsParams>
 }
