@@ -3,6 +3,7 @@ import { distinctUntilChanged, map } from 'rxjs/operators'
 import { Range, TextDocument, TextDocumentItem } from 'vscode-languageserver-types'
 import { Selection, URI } from '../types/textDocument'
 import { isEqual } from '../util'
+import { Context, EMPTY_CONTEXT } from './context/expr'
 import { Extension } from './extension'
 
 /**
@@ -29,10 +30,18 @@ export interface Environment<X extends Extension = Extension> {
 
     /** The active extensions, or null if there are none. */
     readonly extensions: X[] | null
+
+    /** Arbitrary key-value pairs that describe other application state. */
+    readonly context: Context
 }
 
 /** An empty CXP environment. */
-export const EMPTY_ENVIRONMENT: Environment<any> = { root: null, component: null, extensions: null }
+export const EMPTY_ENVIRONMENT: Environment<any> = {
+    root: null,
+    component: null,
+    extensions: null,
+    context: EMPTY_CONTEXT,
+}
 
 /** An application component that displays a [TextDocument](#TextDocument). */
 export interface Component {
@@ -66,6 +75,9 @@ export interface ObservableEnvironment<X extends Extension = Extension> {
 
     /** The active component's text document (and changes to it). */
     readonly textDocument: Observable<Pick<TextDocument, 'uri' | 'languageId'> | null>
+
+    /** The environment's context (and changes to it). */
+    readonly context: Observable<Context>
 }
 
 /** An ObservableEnvironment that always represents the empty environment and never emits changes. */
@@ -74,6 +86,7 @@ export const EMPTY_OBSERVABLE_ENVIRONMENT: ObservableEnvironment<any> = {
     root: of(null),
     component: of(null),
     textDocument: of(null),
+    context: of(EMPTY_CONTEXT),
 }
 
 export function createObservableEnvironment<X extends Extension>(
@@ -92,6 +105,10 @@ export function createObservableEnvironment<X extends Extension>(
         component,
         textDocument: component.pipe(
             map(component => (component ? component.document : null)),
+            distinctUntilChanged((a, b) => isEqual(a, b))
+        ),
+        context: environment.pipe(
+            map(({ context }) => context),
             distinctUntilChanged((a, b) => isEqual(a, b))
         ),
     }

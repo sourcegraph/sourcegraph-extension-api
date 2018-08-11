@@ -95,7 +95,7 @@ export class Controller<X extends Extension = Extension> implements Unsubscribab
     private subscriptions = new Subscription()
 
     /** The registries for various providers that expose extension functionality. */
-    public readonly registries = new Registries()
+    public readonly registries: Registries<X>
 
     private readonly _logMessages = new Subject<LogMessageParams & MessageSource>()
     private readonly _showMessages = new Subject<ShowMessageParams & MessageSource>()
@@ -124,6 +124,8 @@ export class Controller<X extends Extension = Extension> implements Unsubscribab
                 c.client.unsubscribe()
             }
         })
+
+        this.registries = new Registries<X>(this.environment)
     }
 
     public setEnvironment(nextEnvironment: Environment<X>): void {
