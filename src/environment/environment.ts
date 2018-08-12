@@ -3,6 +3,7 @@ import { distinctUntilChanged, map } from 'rxjs/operators'
 import { Range, TextDocument, TextDocumentItem } from 'vscode-languageserver-types'
 import { Selection, URI } from '../types/textDocument'
 import { isEqual } from '../util'
+import { Context, EMPTY_CONTEXT } from './context/expr'
 import { Extension } from './extension'
 
 /**
@@ -33,6 +34,9 @@ export interface Environment<X extends Extension = Extension, C extends object =
 
     /** The configuration settings. */
     readonly configuration: C
+
+    /** Arbitrary key-value pairs that describe other application state. */
+    readonly context: Context
 }
 
 /** An empty CXP environment. */
@@ -41,6 +45,7 @@ export const EMPTY_ENVIRONMENT: Environment<any, any> = {
     component: null,
     extensions: null,
     configuration: {},
+    context: EMPTY_CONTEXT,
 }
 
 /** An application component that displays a [TextDocument](#TextDocument). */
@@ -81,6 +86,9 @@ export interface ObservableEnvironment<X extends Extension, C extends object> {
 
     /** The environment's configuration (and changes to it). */
     readonly configuration: Observable<C>
+
+    /** The environment's context (and changes to it). */
+    readonly context: Observable<Context>
 }
 
 /** An ObservableEnvironment that always represents the empty environment and never emits changes. */
@@ -93,6 +101,7 @@ export const EMPTY_OBSERVABLE_ENVIRONMENT: ObservableEnvironment<any, any> = {
     component: of(null),
     textDocument: of(null),
     configuration: of({}),
+    context: of(EMPTY_CONTEXT),
 }
 
 /**
@@ -121,6 +130,10 @@ export function createObservableEnvironment<X extends Extension, C extends objec
         ),
         configuration: environment.pipe(
             map(({ configuration }) => configuration),
+            distinctUntilChanged((a, b) => isEqual(a, b))
+        ),
+        context: environment.pipe(
+            map(({ context }) => context),
             distinctUntilChanged((a, b) => isEqual(a, b))
         ),
     }
