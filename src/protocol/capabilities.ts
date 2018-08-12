@@ -6,6 +6,7 @@ import { ConfigurationClientCapabilities } from './configuration'
 import { ContributionClientCapabilities, ContributionServerCapabilities } from './contribution'
 import { DecorationClientCapabilities, DecorationServerCapabilities } from './decoration'
 import { DocumentLinkOptions } from './documentLink'
+import { FilesExtensionClientCapabilities } from './extension-files'
 import { ImplementationClientCapabilities, ImplementationServerCapabilities } from './implementation'
 import { SignatureHelpOptions } from './signatureHelp'
 import { TextDocumentClientCapabilities, TextDocumentSyncKind, TextDocumentSyncOptions } from './textDocument'
@@ -41,7 +42,8 @@ export type ClientCapabilities = _ClientCapabilities &
     ConfigurationClientCapabilities &
     ColorClientCapabilities &
     ContributionClientCapabilities &
-    DecorationClientCapabilities
+    DecorationClientCapabilities &
+    FilesExtensionClientCapabilities
 
 /**
  * Defines the capabilities provided by a language

@@ -1,5 +1,6 @@
 import { basename } from 'path'
 import { BehaviorSubject, Observable, Unsubscribable } from 'rxjs'
+import { TextDocumentIdentifier, TextDocumentItem } from 'vscode-languageserver-types'
 import { MessageTransports } from '../jsonrpc2/connection'
 import {
     GenericNotificationHandler,
@@ -7,8 +8,8 @@ import {
     NotificationHandler,
     RequestHandler,
 } from '../jsonrpc2/handlers'
-import { Message, MessageType as RPCMessageType } from '../jsonrpc2/messages'
 import { NotificationType, RequestType } from '../jsonrpc2/messages'
+import { Message, MessageType as RPCMessageType } from '../jsonrpc2/messages'
 import { noopTracer, Trace, Tracer } from '../jsonrpc2/trace'
 import {
     InitializedNotification,
@@ -49,6 +50,15 @@ export interface ClientOptions {
 
     /** Called to create the connection to the server. */
     createMessageTransports: () => MessageTransports | Promise<MessageTransports>
+
+    /**
+     * Called when the server requests to list files or get file contents. See
+     * https://github.com/sourcegraph/language-server-protocol/blob/8313aa98092692c17faffda5336b8951fc03266a/extension-files.md
+     */
+    files?: {
+        xfiles: (base?: string) => Promise<TextDocumentIdentifier[]>
+        xcontent: ({ textDocument }: { textDocument: TextDocumentIdentifier }) => Promise<TextDocumentItem>
+    }
 
     /** Trace log level. The tracer must also be set. */
     trace?: Trace

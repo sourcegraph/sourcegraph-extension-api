@@ -12,6 +12,7 @@ import {
     TextDocumentDynamicDecorationFeature,
     TextDocumentStaticDecorationFeature,
 } from '../client/features/decoration'
+import { FilesExtensionFeature } from '../client/features/extension-files'
 import { TextDocumentHoverFeature } from '../client/features/hover'
 import {
     TextDocumentDefinitionFeature,
@@ -248,6 +249,9 @@ export class Controller<X extends Extension = Extension> implements Unsubscribab
                     })
             )
         )
+        if (client.options.files) {
+            client.registerFeature(new FilesExtensionFeature(client))
+        }
     }
 
     public readonly environment: ObservableEnvironment<X> = createObservableEnvironment<X>(this._environment)
