@@ -1,20 +1,20 @@
 import { combineLatest, Observable } from 'rxjs'
 import { map, switchMap } from 'rxjs/operators'
-import { TextDocumentRegistrationOptions } from '../../protocol'
-import { TextDocumentDecoration, TextDocumentDecorationParams } from '../../protocol/decoration'
-import { TextDocumentFeatureProviderRegistry } from './textDocument'
+import { TextDocumentIdentifier } from 'vscode-languageserver-types'
+import { TextDocumentDecoration } from '../../protocol/decoration'
+import { FeatureProviderRegistry } from './registry'
 import { flattenAndCompact } from './util'
 
 export type ProvideTextDocumentDecorationSignature = (
-    params: TextDocumentDecorationParams
+    textDocument: TextDocumentIdentifier
 ) => Observable<TextDocumentDecoration[] | null>
 
 /** Provides text document decorations from all extensions. */
-export class TextDocumentDecorationProviderRegistry extends TextDocumentFeatureProviderRegistry<
-    TextDocumentRegistrationOptions,
+export class TextDocumentDecorationProviderRegistry extends FeatureProviderRegistry<
+    undefined,
     ProvideTextDocumentDecorationSignature
 > {
-    public getDecorations(params: TextDocumentDecorationParams): Observable<TextDocumentDecoration[] | null> {
+    public getDecorations(params: TextDocumentIdentifier): Observable<TextDocumentDecoration[] | null> {
         return getDecorations(this.providers, params)
     }
 }
@@ -27,7 +27,7 @@ export class TextDocumentDecorationProviderRegistry extends TextDocumentFeatureP
  */
 export function getDecorations(
     providers: Observable<ProvideTextDocumentDecorationSignature[]>,
-    params: TextDocumentDecorationParams
+    params: TextDocumentIdentifier
 ): Observable<TextDocumentDecoration[] | null> {
     return providers
         .pipe(

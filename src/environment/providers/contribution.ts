@@ -1,7 +1,8 @@
-import { BehaviorSubject, Observable, Unsubscribable } from 'rxjs'
+import { BehaviorSubject, combineLatest, Observable, Unsubscribable } from 'rxjs'
 import { distinctUntilChanged, map } from 'rxjs/operators'
 import { ContributableMenu, Contributions, MenuItemContribution } from '../../protocol'
 import { isEqual } from '../../util'
+import { Context, contextFilter } from '../context/expr'
 
 /** A registered set of contributions from an extension in the registry. */
 export interface ContributionsEntry {
@@ -19,7 +20,10 @@ export interface ContributionUnsubscribable extends Unsubscribable {
 
 /** Manages and executes contributions from all extensions. */
 export class ContributionRegistry {
+    /** All entries, including entries that are not enabled in the current context. */
     private _entries = new BehaviorSubject<ContributionsEntry[]>([])
+
+    public constructor(private context: Observable<Context>) {}
 
     /** Register contributions and return an unsubscribable that deregisters the contributions. */
     public registerContributions(entry: ContributionsEntry): ContributionUnsubscribable {
@@ -51,23 +55,18 @@ export class ContributionRegistry {
     }
 
     /**
-     * All contributions (merged), emitted whenever the set of registered contributions changes.
+     * All contributions (merged) that are enabled for the current context, emitted whenever the set changes.
      */
     public readonly contributions: Observable<Contributions> = this.getContributions(this._entries)
 
     protected getContributions(entries: Observable<ContributionsEntry[]>): Observable<Contributions> {
-        return entries.pipe(
+        const contributions = entries.pipe(
             map(entries => mergeContributions(entries.map(e => e.contributions))),
             distinctUntilChanged((a, b) => isEqual(a, b))
         )
-    }
-
-    /**
-     * The current set of contributions (merged). Used by callers that do not need to react to contributions being
-     * registered or unregistered.
-     */
-    public get contributionsSnapshot(): Contributions {
-        return mergeContributions(this._entries.value.map(e => e.contributions))
+        return combineLatest(contributions, this.context).pipe(
+            map(([contributions, context]) => filterContributions(context, contributions))
+        )
     }
 
     /**
@@ -116,4 +115,12 @@ export function mergeContributions(contributions: Contributions[]): Contribution
         }
     }
     return merged
+}
+
+/** Filters the contributions to only those that are enabled in the current context. */
+export function filterContributions(context: Context, contributions: Contributions): Contributions {
+    return {
+        ...contributions,
+        commands: contributions.commands ? contextFilter(context, contributions.commands) : undefined,
+    }
 }
