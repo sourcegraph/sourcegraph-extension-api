@@ -1,11 +1,10 @@
 import * as assert from 'assert'
 import { Observable } from 'rxjs'
 import { first } from 'rxjs/operators'
-import { EMPTY_CONTEXT } from './context/expr'
 import { ClientEntry, Controller } from './controller'
-import { Environment } from './environment'
+import { EMPTY_ENVIRONMENT, Environment } from './environment'
 
-class TestController extends Controller {
+class TestController extends Controller<any, any> {
     public get clientEntries(): Observable<ClientEntry[]> & { value: ClientEntry[] } {
         let value!: ClientEntry[]
         super.clientEntries
@@ -30,14 +29,15 @@ const create = (environment?: Environment): TestController => {
     return controller
 }
 
-const FIXTURE_ENVIRONMENT: Environment = {
+const FIXTURE_ENVIRONMENT: Environment<any, any> = {
     root: 'file:///',
     component: {
         document: { uri: 'file:///f', languageId: 'l', version: 1, text: '' },
         selections: [],
         visibleRanges: [],
     },
-    extensions: [{ id: 'x', settings: { merged: {} } }],
+    extensions: [{ id: 'x' }],
+    configuration: {},
     context: new Map([]),
 }
 
@@ -52,16 +52,12 @@ describe('Controller', () => {
 
     it('creates clients for extensions even when root and component are not set', () => {
         assert.strictEqual(
-            create({ root: null, component: null, extensions: FIXTURE_ENVIRONMENT.extensions, context: EMPTY_CONTEXT })
-                .clientEntries.value.length,
+            create({ ...EMPTY_ENVIRONMENT, extensions: FIXTURE_ENVIRONMENT.extensions }).clientEntries.value.length,
             1
         )
     })
 
     it('creates no clients if the environment needs none', () => {
-        assert.deepStrictEqual(
-            create({ root: null, component: null, extensions: null, context: EMPTY_CONTEXT }).clientEntries.value,
-            []
-        )
+        assert.deepStrictEqual(create(EMPTY_ENVIRONMENT).clientEntries.value, [])
     })
 })

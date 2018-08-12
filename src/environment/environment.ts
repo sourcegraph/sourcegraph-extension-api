@@ -13,8 +13,9 @@ import { Extension } from './extension'
  * and support extension configuration.
  *
  * @template X extension type, to support storing additional properties on extensions
+ * @template C settings type
  */
-export interface Environment<X extends Extension = Extension> {
+export interface Environment<X extends Extension = Extension, C extends object = { [key: string]: any }> {
     /**
      * The root URI of the environment, or null if there is none (which means the extension is unable to access any
      * documents in the environment).
@@ -31,15 +32,19 @@ export interface Environment<X extends Extension = Extension> {
     /** The active extensions, or null if there are none. */
     readonly extensions: X[] | null
 
+    /** The configuration settings. */
+    readonly configuration: C
+
     /** Arbitrary key-value pairs that describe other application state. */
     readonly context: Context
 }
 
 /** An empty CXP environment. */
-export const EMPTY_ENVIRONMENT: Environment<any> = {
+export const EMPTY_ENVIRONMENT: Environment<any, any> = {
     root: null,
     component: null,
     extensions: null,
+    configuration: {},
     context: EMPTY_CONTEXT,
 }
 
@@ -62,10 +67,13 @@ export interface Component {
  * Observables for changes to the environment.
  *
  * Includes derived observables for convenience.
+ *
+ * @template X extension type, to support storing additional properties on extensions
+ * @template C settings type
  */
-export interface ObservableEnvironment<X extends Extension = Extension> {
+export interface ObservableEnvironment<X extends Extension, C extends object> {
     /** The environment (and changes to it). */
-    readonly environment: Observable<Environment<X>> & { readonly value: Environment<X> }
+    readonly environment: Observable<Environment<X, C>> & { readonly value: Environment<X, C> }
 
     /** The environment's root URI (and changes to it). */
     readonly root: Observable<URI | null>
@@ -76,22 +84,35 @@ export interface ObservableEnvironment<X extends Extension = Extension> {
     /** The active component's text document (and changes to it). */
     readonly textDocument: Observable<Pick<TextDocument, 'uri' | 'languageId'> | null>
 
+    /** The environment's configuration (and changes to it). */
+    readonly configuration: Observable<C>
+
     /** The environment's context (and changes to it). */
     readonly context: Observable<Context>
 }
 
 /** An ObservableEnvironment that always represents the empty environment and never emits changes. */
-export const EMPTY_OBSERVABLE_ENVIRONMENT: ObservableEnvironment<any> = {
-    environment: { ...of(EMPTY_ENVIRONMENT), value: EMPTY_ENVIRONMENT } as ObservableEnvironment['environment'],
+export const EMPTY_OBSERVABLE_ENVIRONMENT: ObservableEnvironment<any, any> = {
+    environment: { ...of(EMPTY_ENVIRONMENT), value: EMPTY_ENVIRONMENT } as ObservableEnvironment<
+        any,
+        any
+    >['environment'],
     root: of(null),
     component: of(null),
     textDocument: of(null),
+    configuration: of({}),
     context: of(EMPTY_CONTEXT),
 }
 
-export function createObservableEnvironment<X extends Extension>(
-    environment: Observable<Environment<X>> & { readonly value: Environment<X> }
-): ObservableEnvironment<X> {
+/**
+ * Helper function for creating an ObservableEnvironment from the raw environment Observable.
+ *
+ * @template X extension type
+ * @template C settings type
+ */
+export function createObservableEnvironment<X extends Extension, C extends object>(
+    environment: Observable<Environment<X, C>> & { readonly value: Environment<X, C> }
+): ObservableEnvironment<X, C> {
     const component = environment.pipe(
         map(({ component }) => component),
         distinctUntilChanged((a, b) => isEqual(a, b))
@@ -105,6 +126,10 @@ export function createObservableEnvironment<X extends Extension>(
         component,
         textDocument: component.pipe(
             map(component => (component ? component.document : null)),
+            distinctUntilChanged((a, b) => isEqual(a, b))
+        ),
+        configuration: environment.pipe(
+            map(({ configuration }) => configuration),
             distinctUntilChanged((a, b) => isEqual(a, b))
         ),
         context: environment.pipe(

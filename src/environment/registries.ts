@@ -7,9 +7,14 @@ import { TextDocumentDecorationProviderRegistry } from './providers/decoration'
 import { TextDocumentHoverProviderRegistry } from './providers/hover'
 import { TextDocumentLocationProviderRegistry } from './providers/location'
 
-/** Registries is a container for all provider registries. */
-export class Registries<X extends Extension> {
-    constructor(private environment: ObservableEnvironment<X>) {}
+/**
+ * Registries is a container for all provider registries.
+ *
+ * @template X extension type
+ * @template C settings type
+ */
+export class Registries<X extends Extension, C extends object> {
+    constructor(private environment: ObservableEnvironment<X, C>) {}
 
     public readonly commands = new CommandRegistry()
     public readonly contribution = new ContributionRegistry(this.environment.context)
