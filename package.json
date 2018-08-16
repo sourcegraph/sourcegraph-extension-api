@@ -23,14 +23,14 @@
     "prettier": "prettier '**/*.{js?(on),ts}' --write --list-different",
     "tslint": "tslint -c tslint.json -p tsconfig.json './src/**/*.ts'",
     "typecheck": "tsc -p tsconfig.json",
-    "build:assets": "cpy --parents --cwd=src '**/*.json' '../lib/'",
+    "build:assets": "typescript-json-schema --include src/protocol/contribution.ts --out lib/protocol/contribution.schema.json tsconfig.dist.module.json ActionContribution",
     "build:commonjs": "tsc -p tsconfig.dist.commonjs.json",
     "build:module": "tsc -p tsconfig.dist.module.json",
-    "build": "npm run build:assets && npm run build:commonjs && npm run build:module",
+    "build": "npm run build:commonjs && npm run build:module && npm run build:assets",
     "test": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' mocha --require ts-node/register --require source-map-support/register --opts mocha.opts",
     "cover": "TS_NODE_COMPILER_OPTIONS='{\"module\":\"commonjs\"}' nyc --require ts-node/register --require source-map-support/register --all mocha --opts mocha.opts --timeout 10000",
     "watch:typecheck": "tsc -p tsconfig.json -w",
-    "watch:build:assets": "nodemon --watch src/ --ext json --exec 'npm run build:assets || exit 1'",
+    "watch:build:assets": "nodemon --watch src/protocol/contribution.ts --exec 'npm run build:assets || exit 1'",
     "watch:build:commonjs": "tsc -p tsconfig.dist.commonjs.json -w",
     "watch:build:module": "tsc -p tsconfig.dist.module.json -w",
     "watch:build": "concurrently --kill-others 'npm:watch:build:*'",
@@ -88,7 +88,8 @@
     "ts-node": "^7.0.0",
     "tslint": "^5.10.0",
     "tslint-language-service": "^0.9.9",
-    "typescript": "^3.0.1-insiders"
+    "typescript": "^3.0.1-insiders",
+    "typescript-json-schema": "^0.31.0"
   },
   "optionalDependencies": {}
 }
