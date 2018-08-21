@@ -1,6 +1,7 @@
 import { NotificationType, RequestType } from '../jsonrpc2/messages'
 import { URI } from '../types/textDocument'
 import { ClientCapabilities, ServerCapabilities } from './capabilities'
+import { ConfigurationCascade } from './configuration'
 import { WorkspaceFoldersInitializeParams } from './workspaceFolder'
 
 /**
@@ -30,7 +31,14 @@ export interface _InitializeParams {
     capabilities: ClientCapabilities
 
     /**
-     * User provided initialization options.
+     * The configuration at initialization time. If the configuration changes on the client, the client will report
+     * the update to the extension by sending a `workspace/didChangeConfiguration`
+     * ({@link DidChangeConfigurationNotification}) notification.
+     */
+    configurationCascade: ConfigurationCascade
+
+    /**
+     * Custom initialization options.
      */
     initializationOptions?: any
 

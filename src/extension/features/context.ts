@@ -1,7 +1,7 @@
 import { Context } from '../../environment/context/context'
-import { ClientCapabilities, ServerCapabilities } from '../../protocol'
+import { InitializeParams, ServerCapabilities } from '../../protocol'
 import { ContextUpdateNotification, ContextUpdateParams } from '../../protocol/context'
-import { IConnection } from '../server'
+import { Connection } from '../server'
 import { Remote } from './common'
 
 /**
@@ -19,20 +19,20 @@ export interface RemoteContext extends Remote {
 }
 
 export class RemoteContextImpl implements RemoteContext {
-    private _connection?: IConnection
+    private _connection?: Connection
 
-    public attach(connection: IConnection): void {
+    public attach(connection: Connection): void {
         this._connection = connection
     }
 
-    public get connection(): IConnection {
+    public get connection(): Connection {
         if (!this._connection) {
             throw new Error('Remote is not attached to a connection yet.')
         }
         return this._connection
     }
 
-    public initialize(_capabilities: ClientCapabilities): void {
+    public initialize(_params: InitializeParams): void {
         /* noop */
     }
 

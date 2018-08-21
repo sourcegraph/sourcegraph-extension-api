@@ -1,6 +1,6 @@
 import { Logger, MessageConnection } from '../../jsonrpc2/connection'
-import { ClientCapabilities, LogMessageNotification, MessageType, ServerCapabilities } from '../../protocol'
-import { IConnection } from '../server'
+import { InitializeParams, LogMessageNotification, MessageType, ServerCapabilities } from '../../protocol'
+import { Connection } from '../server'
 import { Remote } from './common'
 
 /**
@@ -40,17 +40,17 @@ export interface RemoteConsole extends Remote {
 
 export class ConnectionLogger implements Logger, RemoteConsole {
     private _rawConnection?: MessageConnection
-    private _connection?: IConnection
+    private _connection?: Connection
 
     public rawAttach(connection: MessageConnection): void {
         this._rawConnection = connection
     }
 
-    public attach(connection: IConnection): void {
+    public attach(connection: Connection): void {
         this._connection = connection
     }
 
-    public get connection(): IConnection {
+    public get connection(): Connection {
         if (!this._connection) {
             throw new Error('Remote is not attached to a connection yet.')
         }
@@ -61,7 +61,7 @@ export class ConnectionLogger implements Logger, RemoteConsole {
         /* noop */
     }
 
-    public initialize(_capabilities: ClientCapabilities): void {
+    public initialize(_params: InitializeParams): void {
         /* noop */
     }
 

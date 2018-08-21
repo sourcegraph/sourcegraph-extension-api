@@ -1,5 +1,5 @@
 import {
-    ClientCapabilities,
+    InitializeParams,
     MessageActionItem,
     MessageType,
     ServerCapabilities,
@@ -7,7 +7,7 @@ import {
     ShowMessageRequest,
     ShowMessageRequestParams,
 } from '../../protocol'
-import { IConnection } from '../server'
+import { Connection } from '../server'
 import { Remote } from './common'
 
 /**
@@ -50,20 +50,20 @@ export interface RemoteWindow extends Remote {
 }
 
 export class RemoteWindowImpl implements RemoteWindow {
-    private _connection?: IConnection
+    private _connection?: Connection
 
-    public attach(connection: IConnection): void {
+    public attach(connection: Connection): void {
         this._connection = connection
     }
 
-    public get connection(): IConnection {
+    public get connection(): Connection {
         if (!this._connection) {
             throw new Error('Remote is not attached to a connection yet.')
         }
         return this._connection
     }
 
-    public initialize(_capabilities: ClientCapabilities): void {
+    public initialize(_params: InitializeParams): void {
         /* noop */
     }
 

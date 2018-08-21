@@ -1,6 +1,6 @@
 import { LogTraceNotification, Trace } from '../../jsonrpc2/trace'
-import { ClientCapabilities, ServerCapabilities } from '../../protocol'
-import { IConnection } from '../server'
+import { InitializeParams, ServerCapabilities } from '../../protocol'
+import { Connection } from '../server'
 import { Remote } from './common'
 
 /**
@@ -16,24 +16,24 @@ export interface Tracer extends Remote {
 
 export class TracerImpl implements Tracer {
     private _trace: Trace
-    private _connection?: IConnection
+    private _connection?: Connection
 
     constructor() {
         this._trace = Trace.Off
     }
 
-    public attach(connection: IConnection): void {
+    public attach(connection: Connection): void {
         this._connection = connection
     }
 
-    public get connection(): IConnection {
+    public get connection(): Connection {
         if (!this._connection) {
             throw new Error('Remote is not attached to a connection yet.')
         }
         return this._connection
     }
 
-    public initialize(_capabilities: ClientCapabilities): void {
+    public initialize(_params: InitializeParams): void {
         /* noop */
     }
 

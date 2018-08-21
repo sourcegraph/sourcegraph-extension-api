@@ -1,29 +1,30 @@
-import { ClientCapabilities, ServerCapabilities } from '../../protocol'
-import { IConnection } from '../server'
+import { Unsubscribable } from 'rxjs'
+import { InitializeParams, ServerCapabilities } from '../../protocol'
+import { Connection } from '../server'
 
 /**
- *
+ * A proxy for values and methods that exist on the remote client.
  */
-export interface Remote {
+export interface Remote extends Partial<Unsubscribable> {
     /**
      * Attach the remote to the given connection.
      *
      * @param connection The connection this remote is operating on.
      */
-    attach(connection: IConnection): void
+    attach(connection: Connection): void
 
     /**
      * The connection this remote is attached to.
      */
-    connection: IConnection
+    connection: Connection
 
     /**
      * Called to initialize the remote with the given
      * client capabilities
      *
-     * @param capabilities The client capabilities
+     * @param params the initialization parameters from the client
      */
-    initialize(capabilities: ClientCapabilities): void
+    initialize(params: InitializeParams): void
 
     /**
      * Called to fill in the server capabilities this feature implements.
