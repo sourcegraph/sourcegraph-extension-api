@@ -9,6 +9,7 @@ import {
 import { ContextFeature } from '../client/features/context'
 import { ContributionFeature } from '../client/features/contribution'
 import { TextDocumentDecorationFeature } from '../client/features/decoration'
+import { ExperimentalClientCapabilitiesFeature } from '../client/features/experimentalClientCapabilities'
 import { TextDocumentHoverFeature } from '../client/features/hover'
 import {
     TextDocumentDefinitionFeature,
@@ -78,7 +79,13 @@ export interface ControllerOptions<X extends Extension, C extends ConfigurationC
         extension: X
     ) => Pick<
         ClientOptions,
-        'middleware' | 'createMessageTransports' | 'errorHandler' | 'initializationFailedHandler' | 'trace' | 'tracer'
+        | 'middleware'
+        | 'createMessageTransports'
+        | 'errorHandler'
+        | 'initializationFailedHandler'
+        | 'trace'
+        | 'tracer'
+        | 'experimentalClientCapabilities'
     >
 
     /**
@@ -277,6 +284,7 @@ export class Controller<X extends Extension, C extends ConfigurationCascade> imp
                     })
             )
         )
+        client.registerFeature(new ExperimentalClientCapabilitiesFeature(client.options.experimentalClientCapabilities))
     }
 
     public readonly environment: ObservableEnvironment<X, C> = createObservableEnvironment<X, C>(this._environment)
