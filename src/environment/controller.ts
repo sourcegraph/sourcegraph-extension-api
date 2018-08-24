@@ -9,7 +9,6 @@ import {
 import { ContextFeature } from '../client/features/context'
 import { ContributionFeature } from '../client/features/contribution'
 import { TextDocumentDecorationFeature } from '../client/features/decoration'
-import { ExperimentalClientCapabilitiesFeature } from '../client/features/experimentalClientCapabilities'
 import { TextDocumentHoverFeature } from '../client/features/hover'
 import {
     TextDocumentDefinitionFeature,
@@ -284,7 +283,6 @@ export class Controller<X extends Extension, C extends ConfigurationCascade> imp
                     })
             )
         )
-        client.registerFeature(new ExperimentalClientCapabilitiesFeature(client.options.experimentalClientCapabilities))
     }
 
     public readonly environment: ObservableEnvironment<X, C> = createObservableEnvironment<X, C>(this._environment)

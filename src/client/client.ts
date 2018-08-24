@@ -203,7 +203,9 @@ export class Client implements Unsubscribable {
 
         const initParams: InitializeParams = {
             root: this.options.root,
-            capabilities: {},
+            capabilities: {
+                experimental: this.options.experimentalClientCapabilities,
+            },
             configurationCascade: { merged: {} },
             initializationOptions: isFunction(this.options.initializationOptions)
                 ? this.options.initializationOptions()
