@@ -1,4 +1,4 @@
-import { BehaviorSubject, Subscription } from 'rxjs'
+import { Subscription } from 'rxjs'
 import { createMessageConnection, Logger, MessageConnection, MessageTransports } from '../jsonrpc2/connection'
 import {
     ConfigurationCascade,
@@ -7,7 +7,6 @@ import {
     InitializeRequest,
     InitializeResult,
 } from '../protocol'
-import { URI } from '../types/textDocument'
 import { Commands, Configuration, CXP, ExtensionContext, Observable, Window, Windows } from './api'
 import { createExtCommands } from './features/commands'
 import { createExtConfiguration } from './features/configuration'
@@ -15,7 +14,6 @@ import { createExtContext } from './features/context'
 import { ExtWindows } from './features/windows'
 
 class ExtensionHandle<C> implements CXP<C> {
-    public readonly roots: Observable<URI[]>
     public readonly configuration: Configuration<C> & Observable<C>
     public get windows(): Windows & Observable<Window[]> {
         return this._windows
@@ -29,7 +27,6 @@ class ExtensionHandle<C> implements CXP<C> {
     constructor(public readonly rawConnection: MessageConnection, public readonly initializeParams: InitializeParams) {
         this.subscription.add(this.rawConnection)
 
-        this.roots = new BehaviorSubject<URI[]>(initializeParams.root ? [initializeParams.root] : [])
         this.configuration = createExtConfiguration<C>(
             this,
             initializeParams.configurationCascade as ConfigurationCascade<C>
@@ -37,10 +34,6 @@ class ExtensionHandle<C> implements CXP<C> {
         this._windows = new ExtWindows(this)
         this.commands = createExtCommands(this)
         this.context = createExtContext(this)
-    }
-
-    public get root(): URI | null {
-        return this.initializeParams.root
     }
 
     public get activeWindow(): Window | null {
