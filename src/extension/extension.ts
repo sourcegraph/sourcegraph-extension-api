@@ -1,4 +1,4 @@
-import { Subscription } from 'rxjs'
+import { BehaviorSubject, Subscription } from 'rxjs'
 import { createMessageConnection, Logger, MessageConnection, MessageTransports } from '../jsonrpc2/connection'
 import {
     ConfigurationCascade,
@@ -15,6 +15,7 @@ import { createExtContext } from './features/context'
 import { ExtWindows } from './features/windows'
 
 class ExtensionHandle<C> implements CXP<C> {
+    public readonly roots: Observable<URI[]>
     public readonly configuration: Configuration<C> & Observable<C>
     public get windows(): Windows & Observable<Window[]> {
         return this._windows
@@ -28,6 +29,7 @@ class ExtensionHandle<C> implements CXP<C> {
     constructor(public readonly rawConnection: MessageConnection, public readonly initializeParams: InitializeParams) {
         this.subscription.add(this.rawConnection)
 
+        this.roots = new BehaviorSubject<URI[]>(initializeParams.root ? [initializeParams.root] : [])
         this.configuration = createExtConfiguration<C>(
             this,
             initializeParams.configurationCascade as ConfigurationCascade<C>
