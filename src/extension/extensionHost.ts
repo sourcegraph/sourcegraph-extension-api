@@ -8,6 +8,7 @@ import { ExtConfiguration } from './api/configuration'
 import { ExtContext } from './api/context'
 import { ExtDocuments } from './api/documents'
 import { ExtLanguageFeatures } from './api/languageFeatures'
+import { ExtSearch } from './api/search'
 import { ExtWindows } from './api/windows'
 import { Location } from './types/location'
 import { Position } from './types/position'
@@ -79,6 +80,9 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const configuration = new ExtConfiguration<any>(proxy('configuration'))
     handleRequests(connection, 'configuration', configuration)
 
+    const search = new ExtSearch(proxy('search'))
+    handleRequests(connection, 'search', search)
+
     const languageFeatures = new ExtLanguageFeatures(proxy('languageFeatures'), documents)
     handleRequests(connection, 'languageFeatures', languageFeatures)
 
@@ -115,6 +119,10 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
         configuration: {
             get: () => configuration.get(),
             subscribe: next => configuration.subscribe(next),
+        },
+
+        search: {
+            registerSearchOperatorProvider: (id, provider) => search.registerSearchOperatorProvider(id, provider),
         },
 
         languages: {

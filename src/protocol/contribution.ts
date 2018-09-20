@@ -1,4 +1,6 @@
 import { KeyPath } from './configuration'
+import { IndexerContributions } from './contributions/indexer'
+import { SearchOperatorContribution } from './contributions/searchOperator'
 
 /**
  * Contributions describes the functionality provided by an extension.
@@ -9,6 +11,12 @@ export interface Contributions {
 
     /** Menu items contributed by the extension. */
     menus?: MenuContributions
+
+    /** Search query operators contributed by the extension. */
+    searchQueryOperators?: SearchOperatorContribution[]
+
+    /** Indexers contributed by the extension. */
+    indexers?: IndexerContributions
 }
 
 /**

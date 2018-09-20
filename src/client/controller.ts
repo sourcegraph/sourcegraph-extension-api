@@ -19,6 +19,7 @@ import { ClientConfiguration } from './api/configuration'
 import { ClientContext } from './api/context'
 import { ClientDocuments } from './api/documents'
 import { ClientLanguageFeatures } from './api/languageFeatures'
+import { ClientSearch } from './api/search'
 import { ClientWindows } from './api/windows'
 import { applyContextUpdate, EMPTY_CONTEXT } from './context/context'
 import { EMPTY_ENVIRONMENT, Environment } from './environment'
@@ -220,6 +221,7 @@ export class Controller<X extends Extension, C extends ConfigurationCascade> imp
                     new Promise<void>(resolve => this._configurationUpdates.next({ ...params, resolve }))
             )
         )
+        subscription.add(new ClientSearch(client, this.registries.searchOperator))
         subscription.add(
             new ClientContext(client, (updates: ContextValues) =>
                 // Set environment manually, not via Controller#setEnvironment, to avoid recursive setEnvironment calls

@@ -5,4 +5,4 @@
 // This dummy file is used when the extension is bundled with a JavaScript bundler that lacks support for externals
 // (or when `sourcegraph` is not configured as an external module). Parcel does not support externals
 // (https://github.com/parcel-bundler/parcel/issues/144). Webpack, Rollup, and Microbundle support externals.
-module.exports = global.require('sourcegraph')
+module.exports = (global && global.require ? global.require : require)('sourcegraph')

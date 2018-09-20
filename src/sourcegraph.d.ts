@@ -580,8 +580,48 @@ declare module 'sourcegraph' {
     /**
      * A provider result represents the values that a provider, such as the {@link HoverProvider},
      * may return.
+     *
+     * TODO!(sqs): remove undefined from here?
      */
     export type ProviderResult<T> = T | undefined | null | Promise<T | undefined | null>
+
+    /**
+     * Provides results and query manipulations for a custom search query operator registered with
+     * {@link search.registerSearchOperatorProvider}.
+     */
+    export interface SearchOperatorProvider {
+        /**
+         * Transform the query to a new query string.
+         *
+         * When the query is interactive, the transformation is not displayed to the user.
+         *
+         * The transformed query string typically replaces the custom operator with other equivalent terms or
+         * operators. This is used to implement simple custom operators. For example, a "file-extension:" operator
+         * might be implemented by simply transforming (e.g.) "file-extension:txt" to "file:\.txt$".
+         *
+         * If the transformed query string contains the custom operator, then {@link transformQuery} will be called
+         * recursively.
+         *
+         * @returns The transformed query string, or `null` or `undefined` if the input query should be used (and
+         * no transformation is needed).
+         */
+        transformQuery?(query: string): ProviderResult<string>
+    }
+
+    /**
+     * Search.
+     */
+    export namespace search {
+        /**
+         * Register a custom search query operator and an associated provider that is called for all search queries
+         * containing the custom operator.
+         *
+         * @param id The name of this custom operator. This must match the `name` defined in the extension's
+         * contributions.
+         * @return An unsubscribable to unregister the custom operator.
+         */
+        export function registerSearchOperatorProvider(name: string, provider: SearchOperatorProvider): Unsubscribable
+    }
 
     /** The kinds of markup that can be used. */
     export const enum MarkupKind {
@@ -703,6 +743,79 @@ declare module 'sourcegraph' {
             position: Position,
             context: ReferenceContext
         ): ProviderResult<Location[]>
+    }
+
+    /**
+     * Information about a dependency of the workspace (e.g., a package that the workspace depends on).
+     *
+     * @see https://sourcegraph.com/github.com/sourcegraph/language-server-protocol@6e7ee16decc5384520a6ec9c52b29e3fa7425567/-/blob/extension-workspace-references.md?view=code#L126
+     */
+    export interface DependencyReference {
+        /**
+         * Language- or build-system-specific attributes about the dependency.
+         */
+        attributes: { [key: string]: any }
+
+        /**
+         * Additional information about this dependency reference (e.g., the specific definitions or packages
+         * inside the dependency that are used by this workspace).
+         */
+        hints?: { [key: string]: any }
+    }
+
+    export interface SymbolicReference {
+        /**
+         * The exact location of the symbol that this reference points to, if known.
+         */
+        location?: {
+            /**
+             * The range enclosing the symbol, including comments and code, but not including leading/trailing
+             * whitespace.
+             */
+            range: Range
+
+            /**
+             * The range that should be selected and revealed when this symbolic reference is followed. This typically
+             * encloses only the symbol's name (e.g., the class or function name). It must be contained within the
+             * {@link SymbolicReference.location.range}.
+             */
+            selectionRange: Range
+        }
+    }
+
+    /**
+     * A dependency provider provides information about dependencies for the workspace.
+     */
+    export interface DependencyProvider {
+        /**
+         * Provides the set of dependencies for this workspace.
+         *
+         * @return An array of references to dependencies.
+         */
+        provideDependencies(): ProviderResult<DependencyReference[]>
+    }
+
+    export interface SymbolicReferenceProvider {
+        /**
+         * Provides the set of symbolic references originating from this workspace.
+         *
+         * TODO!(sqs) NOTE: used to construct the index for cross-workspace find-references
+         *
+         * TODO!(sqs): add filter to only get index data for a subset?
+         */
+        provideSymbolicReferences(): ProviderResult<SymbolicReference[]>
+
+        // TODO!(sqs)
+        //
+        // resolveSymbolicReference
+
+        /**
+         * Resolves a symbolic reference to a location in this workspace. If the symbolic reference doesn't refer
+         * to a symbol in this workspace, `null` is returned.
+         *
+         * TODO!(sqs) NOTE: used in cross-workspace go-to-definition
+         */
+        resolveSymbolicReferenceToDefinition(reference: SymbolicReference): ProviderResult<Definition>
     }
 
     export namespace languages {

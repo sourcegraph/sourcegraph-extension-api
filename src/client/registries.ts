@@ -7,6 +7,7 @@ import { ContributionRegistry } from './providers/contribution'
 import { TextDocumentDecorationProviderRegistry } from './providers/decoration'
 import { TextDocumentHoverProviderRegistry } from './providers/hover'
 import { TextDocumentLocationProviderRegistry, TextDocumentReferencesProviderRegistry } from './providers/location'
+import { SearchOperatorRegistry } from './providers/searchOperator'
 
 /**
  * Registries is a container for all provider registries.
@@ -19,6 +20,7 @@ export class Registries<X extends Extension, C extends ConfigurationCascade> {
 
     public readonly commands = new CommandRegistry()
     public readonly contribution = new ContributionRegistry(this.environment)
+    public readonly searchOperator = new SearchOperatorRegistry()
     public readonly textDocumentDefinition = new TextDocumentLocationProviderRegistry()
     public readonly textDocumentImplementation = new TextDocumentLocationProviderRegistry()
     public readonly textDocumentReferences = new TextDocumentReferencesProviderRegistry()

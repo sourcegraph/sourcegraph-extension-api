@@ -36,7 +36,7 @@ export class ProviderMap<B> {
      * @template P - The specific provider type for the provider with this {@link id}.
      * @throws If there is no entry with the given {@link id}.
      */
-    public get<P extends B>(id: number): P {
+    public get<P extends B = B>(id: number): P {
         const provider = this.map.get(id) as P
         if (!provider) {
             throw new Error(`no provider with ID ${id}`)
