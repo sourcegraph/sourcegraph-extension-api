@@ -717,6 +717,10 @@ declare module 'sourcegraph' {
         ): ProviderResult<Location[]>
     }
 
+    export namespace search {
+        export function foo(): void
+    }
+
     export namespace languages {
         export function registerHoverProvider(selector: DocumentSelector, provider: HoverProvider): Unsubscribable
 
