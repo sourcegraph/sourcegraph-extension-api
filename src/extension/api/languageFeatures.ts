@@ -14,7 +14,6 @@ import * as plain from '../../protocol/plainTypes'
 import { ProviderMap } from './common'
 import { ExtDocuments } from './documents'
 import { fromHover, fromLocation, toPosition } from './types'
-import { CombineLatestOperator } from 'rxjs/internal/observable/combineLatest'
 
 /** @internal */
 export interface ExtLanguageFeaturesAPI {

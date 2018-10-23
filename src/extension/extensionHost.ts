@@ -66,7 +66,11 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const sync = () => connection.sendRequest<void>('ping')
     connection.onRequest('ping', () => 'pong')
 
-    const proxy = (prefix: string) => createProxy((name, args) => connection.sendRequest(`${prefix}/${name}`, args))
+    const proxy = (prefix: string) =>
+        createProxy((name, args) => {
+            console.log('proxy calling send request', name)
+            connection.sendRequest(`${prefix}/${name}`, args)
+        })
 
     const context = new ExtContext(proxy('context'))
     handleRequests(connection, 'context', context)
@@ -83,7 +87,7 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const languageFeatures = new ExtLanguageFeatures(proxy('languageFeatures'), documents)
     handleRequests(connection, 'languageFeatures', languageFeatures)
 
-    const searchFeatures = new ExtSearchFeatures()
+    const searchFeatures = new ExtSearchFeatures(proxy('searchFeatures'))
     handleRequests(connection, 'searchFeatures', searchFeatures)
 
     const commands = new ExtCommands(proxy('commands'))
@@ -134,7 +138,7 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
         },
 
         search: {
-            foo: () => searchFeatures.foo(),
+            registerSearchProvider: provider => searchFeatures.registerSearchProvider(provider),
         },
 
         commands: {

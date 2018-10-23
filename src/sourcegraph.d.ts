@@ -717,8 +717,12 @@ declare module 'sourcegraph' {
         ): ProviderResult<Location[]>
     }
 
+    export interface SearchProvider {
+        transformQuery(query: string): ProviderResult<string>
+    }
+
     export namespace search {
-        export function foo(): void
+        export function registerSearchProvider(provider: SearchProvider): Unsubscribable
     }
 
     export namespace languages {
