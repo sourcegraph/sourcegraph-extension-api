@@ -66,11 +66,7 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const sync = () => connection.sendRequest<void>('ping')
     connection.onRequest('ping', () => 'pong')
 
-    const proxy = (prefix: string) =>
-        createProxy((name, args) => {
-            console.log('proxy calling send request', name)
-            connection.sendRequest(`${prefix}/${name}`, args)
-        })
+    const proxy = (prefix: string) => createProxy((name, args) => connection.sendRequest(`${prefix}/${name}`, args))
 
     const context = new ExtContext(proxy('context'))
     handleRequests(connection, 'context', context)

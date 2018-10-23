@@ -16,10 +16,7 @@ export function createProxy(call: (name: string, args: any[]) => any): any {
     return new Proxy(Object.create(null), {
         get: (target: any, name: string) => {
             if (!target[name] && name[0] === '$') {
-                console.log('intercepting name', name)
                 target[name] = (...args: any[]) => call(name, args)
-            } else {
-                console.log('not intercepting', name)
             }
 
             return target[name]
@@ -40,10 +37,7 @@ export function handleRequests(connection: Connection, prefix: string, handler: 
     for (const name of Object.getOwnPropertyNames(proto)) {
         const value = proto[name]
         if (name[0] === '$' && typeof value === 'function') {
-            console.log('registering request handler', name)
             connection.onRequest(`${prefix}/${name}`, (...args: any[]) => value.apply(handler, args[0]))
-        } else {
-            console.log('not registering', name)
         }
     }
 }
