@@ -24,7 +24,7 @@ export function transformQuery(
     return providers.pipe(
         switchMap(providers => {
             if (providers.length === 0) {
-                return [null]
+                return [query]
             }
             return providers[0](query)
         })
