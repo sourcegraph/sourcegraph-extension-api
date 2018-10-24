@@ -3,7 +3,8 @@ import { switchMap } from 'rxjs/operators'
 import { FeatureProviderRegistry } from './registry'
 
 export type TransformQuerySignature = (query: string) => Observable<string | null | undefined>
-/** Provides hovers from all extensions. */
+
+/** Provides transformed queries from the first search extension. */
 export class SearchTransformProviderRegistry extends FeatureProviderRegistry<{}, TransformQuerySignature> {
     public transformQuery(query: string): Observable<string | null | undefined> {
         return transformQuery(this.providers, query)
@@ -11,10 +12,10 @@ export class SearchTransformProviderRegistry extends FeatureProviderRegistry<{},
 }
 
 /**
- * Returns an observable that emits all providers' hovers whenever any of the last-emitted set of providers emits
- * hovers.
+ * Returns an observable that emits the first provider's transformed query whenever any of the last-emitted set of providers emits
+ * a query.
  *
- * Most callers should use TextDocumentHoverProviderRegistry's getHover method, which uses the registered hover
+ * Most callers should use SearchTransformProviderRegistry's getHover method, which uses the registered search
  * providers.
  */
 export function transformQuery(
