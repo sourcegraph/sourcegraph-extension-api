@@ -1,5 +1,5 @@
 import { Unsubscribable } from 'rxjs'
-import { SearchProvider } from 'sourcegraph'
+import { QueryTransformProvider } from 'sourcegraph'
 import { SearchFeaturesAPI } from 'src/client/api/search'
 import { ProviderMap } from './common'
 
@@ -10,17 +10,17 @@ export interface ExtSearchFeaturesAPI {
 
 /** @internal */
 export class ExtSearchFeatures implements ExtSearchFeaturesAPI {
-    private registrations = new ProviderMap<SearchProvider>(id => this.proxy.$unregister(id))
+    private registrations = new ProviderMap<QueryTransformProvider>(id => this.proxy.$unregister(id))
     constructor(private proxy: SearchFeaturesAPI) {}
 
-    public registerSearchProvider(provider: SearchProvider): Unsubscribable {
+    public registerQueryTransformProvider(provider: QueryTransformProvider): Unsubscribable {
         const { id, subscription } = this.registrations.add(provider)
-        this.proxy.$registerSearchProvider(id)
+        this.proxy.$registerQueryTransformProvider(id)
         return subscription
     }
 
     public $transformQuery(id: number, query: string): Promise<string | null | undefined> {
-        const provider = this.registrations.get<SearchProvider>(id)
+        const provider = this.registrations.get<QueryTransformProvider>(id)
         return Promise.resolve(provider.transformQuery(query))
     }
 }

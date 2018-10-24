@@ -7,7 +7,7 @@ import { TransformQuerySignature } from '../providers/search'
 import { SubscriptionMap } from './common'
 
 export interface SearchFeaturesAPI {
-    $registerSearchProvider(id: number): void
+    $registerQueryTransformProvider(id: number): void
     $unregister(id: number): void
 }
 
@@ -22,7 +22,7 @@ export class SearchFeatures implements SearchFeaturesAPI {
         this.proxy = createProxyAndHandleRequests('searchFeatures', connection, this)
     }
 
-    public $registerSearchProvider(id: number): void {
+    public $registerQueryTransformProvider(id: number): void {
         this.registrations.add(
             id,
             this.searchRegistry.registerProvider(

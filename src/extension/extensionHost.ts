@@ -134,7 +134,7 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
         },
 
         search: {
-            registerSearchProvider: provider => searchFeatures.registerSearchProvider(provider),
+            registerQueryTransformProvider: provider => searchFeatures.registerQueryTransformProvider(provider),
         },
 
         commands: {
