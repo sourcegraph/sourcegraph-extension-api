@@ -26,5 +26,5 @@ export class Registries<X extends Extension, C extends ConfigurationCascade> {
     public readonly textDocumentTypeDefinition = new TextDocumentLocationProviderRegistry()
     public readonly textDocumentHover = new TextDocumentHoverProviderRegistry()
     public readonly textDocumentDecoration = new TextDocumentDecorationProviderRegistry()
-    public readonly search = new QueryTransformerRegistry()
+    public readonly queryTransformer = new QueryTransformerRegistry()
 }

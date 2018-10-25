@@ -18,7 +18,6 @@ export function createProxy(call: (name: string, args: any[]) => any): any {
             if (!target[name] && name[0] === '$') {
                 target[name] = (...args: any[]) => call(name, args)
             }
-
             return target[name]
         },
     })

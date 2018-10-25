@@ -16,7 +16,10 @@ export class Search implements SearchAPI {
     private registrations = new SubscriptionMap()
     private proxy: ExtSearch
 
-    constructor(connection: Connection, private searchRegistry: FeatureProviderRegistry<{}, TransformQuerySignature>) {
+    constructor(
+        connection: Connection,
+        private queryTransformerRegistry: FeatureProviderRegistry<{}, TransformQuerySignature>
+    ) {
         this.subscriptions.add(this.registrations)
 
         this.proxy = createProxyAndHandleRequests('searchFeatures', connection, this)
@@ -25,7 +28,7 @@ export class Search implements SearchAPI {
     public $registerQueryTransformer(id: number): void {
         this.registrations.add(
             id,
-            this.searchRegistry.registerProvider(
+            this.queryTransformerRegistry.registerProvider(
                 {},
                 (query: string): Observable<string | null | undefined> => from(this.proxy.$transformQuery(id, query))
             )
