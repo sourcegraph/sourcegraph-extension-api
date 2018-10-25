@@ -1,20 +1,20 @@
 import { from, Observable, Subscription } from 'rxjs'
-import { ExtSearchFeaturesAPI } from 'src/extension/api/search'
+import { ExtSearch } from 'src/extension/api/search'
 import { Connection } from 'src/protocol/jsonrpc2/connection'
 import { createProxyAndHandleRequests } from '../../common/proxy'
+import { TransformQuerySignature } from '../providers/queryTransformer'
 import { FeatureProviderRegistry } from '../providers/registry'
-import { TransformQuerySignature } from '../providers/search'
 import { SubscriptionMap } from './common'
 
-export interface SearchFeaturesAPI {
-    $registerQueryTransformProvider(id: number): void
+export interface SearchAPI {
+    $registerQueryTransformer(id: number): void
     $unregister(id: number): void
 }
 
-export class SearchFeatures implements SearchFeaturesAPI {
+export class Search implements SearchAPI {
     private subscriptions = new Subscription()
     private registrations = new SubscriptionMap()
-    private proxy: ExtSearchFeaturesAPI
+    private proxy: ExtSearch
 
     constructor(connection: Connection, private searchRegistry: FeatureProviderRegistry<{}, TransformQuerySignature>) {
         this.subscriptions.add(this.registrations)
@@ -22,7 +22,7 @@ export class SearchFeatures implements SearchFeaturesAPI {
         this.proxy = createProxyAndHandleRequests('searchFeatures', connection, this)
     }
 
-    public $registerQueryTransformProvider(id: number): void {
+    public $registerQueryTransformer(id: number): void {
         this.registrations.add(
             id,
             this.searchRegistry.registerProvider(
