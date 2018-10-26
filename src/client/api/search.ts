@@ -6,11 +6,13 @@ import { TransformQuerySignature } from '../providers/queryTransformer'
 import { FeatureProviderRegistry } from '../providers/registry'
 import { SubscriptionMap } from './common'
 
+/** @internal */
 export interface SearchAPI {
     $registerQueryTransformer(id: number): void
     $unregister(id: number): void
 }
 
+/** @internal */
 export class Search implements SearchAPI {
     private subscriptions = new Subscription()
     private registrations = new SubscriptionMap()
@@ -22,7 +24,7 @@ export class Search implements SearchAPI {
     ) {
         this.subscriptions.add(this.registrations)
 
-        this.proxy = createProxyAndHandleRequests('searchFeatures', connection, this)
+        this.proxy = createProxyAndHandleRequests('search', connection, this)
     }
 
     public $registerQueryTransformer(id: number): void {
@@ -30,7 +32,7 @@ export class Search implements SearchAPI {
             id,
             this.queryTransformerRegistry.registerProvider(
                 {},
-                (query: string): Observable<string | null | undefined> => from(this.proxy.$transformQuery(id, query))
+                (query: string): Observable<string> => from(this.proxy.$transformQuery(id, query))
             )
         )
     }

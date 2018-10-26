@@ -717,14 +717,6 @@ declare module 'sourcegraph' {
         ): ProviderResult<Location[]>
     }
 
-    export interface QueryTransformerProvider {
-        transformQuery(query: string): ProviderResult<string>
-    }
-
-    export namespace search {
-        export function registerQueryTransformer(provider: QueryTransformerProvider): Unsubscribable
-    }
-
     export namespace languages {
         export function registerHoverProvider(selector: DocumentSelector, provider: HoverProvider): Unsubscribable
 
@@ -791,6 +783,38 @@ declare module 'sourcegraph' {
             selector: DocumentSelector,
             provider: ReferenceProvider
         ): Unsubscribable
+    }
+
+    /**
+     * A query transformer changes a user's query before passing it to the search backend.
+     * Query transformers allow extensions to define new search query operators and syntax,
+     * for example, by replacing certain custom operators (e.g. `go.imports:`) with a regular expression.
+     *
+     */
+    export interface QueryTransformer {
+        /**
+         * Transforms a search query into another, valid query. If there are no transformations to be made
+         * the original query is returned.
+         *
+         * @param query A search query provided by a client.
+         */
+        transformQuery(query: string): string | Promise<string>
+    }
+
+    /**
+     * Search functionality can be augmented by extensions. Extensions can register query transformers
+     * to alter queries provided by users.
+     */
+    export namespace search {
+        /**
+         * Registers a query transformer.
+         *
+         * Multiple transformers can be registered. In that case, all transformers will be executed
+         * and the result is a single query that has been altered by all transformers.
+         *
+         * @param provider A query transformer.
+         */
+        export function registerQueryTransformer(provider: QueryTransformer): Unsubscribable
     }
 
     /**

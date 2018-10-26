@@ -83,8 +83,8 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const languageFeatures = new ExtLanguageFeatures(proxy('languageFeatures'), documents)
     handleRequests(connection, 'languageFeatures', languageFeatures)
 
-    const searchFeatures = new ExtSearch(proxy('searchFeatures'))
-    handleRequests(connection, 'searchFeatures', searchFeatures)
+    const search = new ExtSearch(proxy('search'))
+    handleRequests(connection, 'search', search)
 
     const commands = new ExtCommands(proxy('commands'))
     handleRequests(connection, 'commands', commands)
@@ -134,7 +134,7 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
         },
 
         search: {
-            registerQueryTransformer: provider => searchFeatures.registerQueryTransformer(provider),
+            registerQueryTransformer: provider => search.registerQueryTransformer(provider),
         },
 
         commands: {

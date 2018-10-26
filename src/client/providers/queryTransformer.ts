@@ -2,11 +2,11 @@ import { Observable, of } from 'rxjs'
 import { flatMap, map, switchMap } from 'rxjs/operators'
 import { FeatureProviderRegistry } from './registry'
 
-export type TransformQuerySignature = (query: string) => Observable<string | null | undefined>
+export type TransformQuerySignature = (query: string) => Observable<string>
 
-/** Provides transformed queries from the first search extension. */
+/** Transforms search queries using registered query transformers from extensions. */
 export class QueryTransformerRegistry extends FeatureProviderRegistry<{}, TransformQuerySignature> {
-    public transformQuery(query: string): Observable<string | null | undefined> {
+    public transformQuery(query: string): Observable<string> {
         return transformQuery(this.providers, query)
     }
 }
@@ -15,13 +15,10 @@ export class QueryTransformerRegistry extends FeatureProviderRegistry<{}, Transf
  * Returns an observable that emits a query transformed by all providers whenever any of the last-emitted set of providers emits
  * a query.
  *
- * Most callers should use QueryTransformerRegistry's transformQuery method, which uses the registered search
- * providers.
+ * Most callers should use QueryTransformerRegistry's transformQuery method, which uses the registered query transformers
+ *
  */
-export function transformQuery(
-    providers: Observable<TransformQuerySignature[]>,
-    query: string
-): Observable<string | null | undefined> {
+export function transformQuery(providers: Observable<TransformQuerySignature[]>, query: string): Observable<string> {
     return providers.pipe(
         switchMap(providers => {
             if (providers.length === 0) {
@@ -29,9 +26,7 @@ export function transformQuery(
             }
             return providers.reduce(
                 (currentQuery, transformQuery) =>
-                    currentQuery.pipe(
-                        flatMap(q => transformQuery(q).pipe(map(transformedQuery => transformedQuery || q)))
-                    ),
+                    currentQuery.pipe(flatMap(q => transformQuery(q).pipe(map(transformedQuery => transformedQuery)))),
                 of(query)
             )
         })
