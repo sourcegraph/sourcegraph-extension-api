@@ -22,7 +22,7 @@ export function transformQuery(providers: Observable<TransformQuerySignature[]>,
     return providers.pipe(
         switchMap(providers => {
             if (providers.length === 0) {
-                return [query]
+                return query
             }
             return providers.reduce(
                 (currentQuery, transformQuery) =>
