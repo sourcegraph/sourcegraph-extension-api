@@ -796,7 +796,7 @@ declare module 'sourcegraph' {
          * Transforms a search query into another, valid query. If there are no transformations to be made
          * the original query is returned.
          *
-         * @param query A search query provided by a client.
+         * @param query A search query.
          */
         transformQuery(query: string): string | Promise<string>
     }
@@ -808,8 +808,9 @@ declare module 'sourcegraph' {
         /**
          * Registers a query transformer.
          *
-         * Multiple transformers can be registered. In that case, all transformers will be executed
-         * and the result is a single query that has been altered by all transformers.
+         * Multiple transformers can be registered. In that case, all transformations will be applied
+         * and the result is a single query that has been altered by all transformers. The order in
+         * which transfomers are applied is not defined.
          *
          * @param provider A query transformer.
          */
