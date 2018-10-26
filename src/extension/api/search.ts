@@ -4,7 +4,7 @@ import { SearchAPI } from 'src/client/api/search'
 import { ProviderMap } from './common'
 
 export interface ExtSearchAPI {
-    $transformQuery: (id: number, query: string) => string | Promise<string>
+    $transformQuery: (id: number, query: string) => Promise<string>
 }
 
 export class ExtSearch implements ExtSearchAPI {
@@ -17,8 +17,8 @@ export class ExtSearch implements ExtSearchAPI {
         return subscription
     }
 
-    public $transformQuery(id: number, query: string): string | Promise<string> {
+    public $transformQuery(id: number, query: string): Promise<string> {
         const provider = this.registrations.get<QueryTransformer>(id)
-        return provider.transformQuery(query)
+        return Promise.resolve(provider.transformQuery(query))
     }
 }
