@@ -786,10 +786,10 @@ declare module 'sourcegraph' {
     }
 
     /**
-     * A query transformer changes a user's query before passing it to the search backend.
-     * Query transformers allow extensions to define new search query operators and syntax,
-     * for example, by replacing certain custom operators (e.g. `go.imports:`) with a regular expression.
+     * A query transformer alters a user's search query before executing a search.
      *
+     * Query transformers allow extensions to define new search query operators and syntax, for example,
+     * by matching strings in a query (e.g. `go.imports:`) and replacing them with a regular expression or string.
      */
     export interface QueryTransformer {
         /**
@@ -802,8 +802,7 @@ declare module 'sourcegraph' {
     }
 
     /**
-     * Search functionality can be augmented by extensions. Extensions can register query transformers
-     * to alter queries provided by users.
+     * API for extensions to augment search functionality.
      */
     export namespace search {
         /**
