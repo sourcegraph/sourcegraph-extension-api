@@ -3,12 +3,10 @@ import { QueryTransformer } from 'sourcegraph'
 import { SearchAPI } from 'src/client/api/search'
 import { ProviderMap } from './common'
 
-/** @internal */
 export interface ExtSearchAPI {
     $transformQuery: (id: number, query: string) => Promise<string>
 }
 
-/** @internal */
 export class ExtSearch implements ExtSearchAPI {
     private registrations = new ProviderMap<QueryTransformer>(id => this.proxy.$unregister(id))
     constructor(private proxy: SearchAPI) {}
