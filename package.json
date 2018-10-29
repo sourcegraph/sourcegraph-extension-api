@@ -20,7 +20,8 @@
   "types": "lib/sourcegraph.d.ts",
   "files": [
     "lib",
-    "module"
+    "module",
+    "docs"
   ],
   "scripts": {
     "commitmsg": "commitlint -e $GIT_PARAMS",
@@ -28,6 +29,7 @@
     "prettier": "prettier '**/{*.{js?(on),ts,yml},.*.yml}' --write --list-different",
     "tslint": "tslint -c tslint.json -p tsconfig.json './src/**/*.ts'",
     "typecheck": "tsc -p tsconfig.json",
+    "typedoc": "typedoc --out docs --readme none --mode file --theme minimal --hideGenerator --includeDeclarations --exclude 'src/extension/**/*' --exclude 'src/client/**/*' --exclude 'src/protocol/**/*' src/sourcegraph.d.ts",
     "build:assets": "mkdir -p lib/protocol && typescript-json-schema --id 'https://sourcegraph.com/v1/contribution.schema.json' --noExtraProps --required --include src/protocol/contribution.ts --out lib/protocol/contribution.schema.json tsconfig.dist.json Contributions && node -e \"/* Deletes the top-level additionalProperties property in the file. */ fs = require('fs');f = process.argv[1];o = JSON.parse(fs.readFileSync(f, 'utf8'));delete o.additionalProperties;fs.writeFileSync(f, JSON.stringify(o, null, 4))\" lib/protocol/contribution.schema.json",
     "build:module": "tsc -p tsconfig.dist.json",
     "build:api": "mkdir -p lib/extension && cpy src/sourcegraph.d.ts lib/ && cpy src/extension/index.js lib/extension",
@@ -88,6 +90,7 @@
     "ts-node": "^7.0.1",
     "tslint": "^5.10.0",
     "tslint-language-service": "^0.9.9",
+    "typedoc": "^0.12.0",
     "typescript": "^3.0.3",
     "typescript-json-schema": "^0.32.0"
   }
