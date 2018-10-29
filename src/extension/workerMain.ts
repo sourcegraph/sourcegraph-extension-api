@@ -1,4 +1,5 @@
 import { tryCatchPromise } from '../util'
+import { createExtensionContext } from './api/storage'
 import { createExtensionHost, InitData } from './extensionHost'
 
 interface MessageEvent {
@@ -46,7 +47,7 @@ export function extensionHostWorkerMain(self: DedicatedWorkerGlobalScope): void 
             self.close()
         }
 
-        const api = createExtensionHost(initData)
+        const { api, extensionContext } = createExtensionHost(initData)
         // Make `import 'sourcegraph'` or `require('sourcegraph')` return the extension host's
         // implementation of the `sourcegraph` module.
         ;(self as any).require = (modulePath: string): any => {
@@ -66,7 +67,7 @@ export function extensionHostWorkerMain(self: DedicatedWorkerGlobalScope): void 
 
         if ('activate' in extensionExports) {
             try {
-                tryCatchPromise(() => extensionExports.activate()).catch((err: any) => {
+                tryCatchPromise(() => extensionExports.activate(extensionContext)).catch((err: any) => {
                     console.error(`Error creating extension host:`, err)
                     self.close()
                 })

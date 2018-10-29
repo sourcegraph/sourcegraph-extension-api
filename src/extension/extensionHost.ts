@@ -59,13 +59,16 @@ export interface InitData {
 export function createExtensionHost(
     initData: InitData,
     transports: MessageTransports = createWebWorkerMessageTransports()
-): typeof sourcegraph {
+): { api: typeof sourcegraph; extensionContext: sourcegraph.ExtensionContext } {
     const connection = createConnection(transports, consoleLogger)
     connection.listen()
     return createExtensionHandle(initData, connection)
 }
 
-function createExtensionHandle(initData: InitData, connection: Connection): typeof sourcegraph {
+function createExtensionHandle(
+    initData: InitData,
+    connection: Connection
+): { api: typeof sourcegraph; extensionContext: sourcegraph.ExtensionContext } {
     const subscription = new Subscription()
     subscription.add(connection)
 
@@ -99,7 +102,10 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const commands = new ExtCommands(proxy('commands'))
     handleRequests(connection, 'commands', commands)
 
-    return {
+    const storage = new ExtStorage(proxy('storage'))
+    handleRequests(connection, 'storage', storage)
+
+    const api: typeof sourcegraph = {
         URI,
         Position,
         Range,
@@ -158,6 +164,15 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
             updateContext: updates => context.updateContext(updates),
             sourcegraphURL: new URI(initData.sourcegraphURL),
             clientApplication: initData.clientApplication,
+        },
+    }
+    return {
+        api,
+        extensionContext: {
+            viewerState: {
+                get: key => storage.get('viewer', key),
+                set: (key, value) => storage.set('viewer', key, value),
+            },
         },
     }
 }

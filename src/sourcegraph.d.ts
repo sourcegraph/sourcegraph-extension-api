@@ -946,6 +946,40 @@ declare module 'sourcegraph' {
     }
 
     /**
+     * The extension context is passed to the extension's activate function and contains utilities for state and
+     * the extension lifecycle.
+     */
+    export interface ExtensionContext {
+        /**
+         * A storage object that holds state for this extension associated with the viewer (an authenticated or
+         * anonymous user). For authenticated users, the state is persisted across clients. For anonymous users,
+         * the state is persisted in client storage (e.g., browser localStorage).
+         */
+        viewerState: Storage
+    }
+
+    /**
+     * An interface that can get and set values.
+     */
+    export interface Storage {
+        /**
+         * Get a value from storage.
+         *
+         * @param key The key for the stored value.
+         * @return The stored value, or undefined if not found.
+         */
+        get<T>(key: string): Promise<T | undefined>
+
+        /**
+         * Set a value in storage.
+         *
+         * @param key The key for the stored value.
+         * @param value A value that can be JSON-stringified.
+         */
+        set(key: string, value: any): Promise<void>
+    }
+
+    /**
      * A stream of values that may be subscribed to.
      */
     export interface Subscribable<T> {
