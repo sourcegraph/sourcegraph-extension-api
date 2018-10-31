@@ -1,5 +1,5 @@
 import { combineLatest, from, Observable } from 'rxjs'
-import { map, switchMap, catchError } from 'rxjs/operators'
+import { catchError, map, switchMap } from 'rxjs/operators'
 import { HoverMerged } from '../../client/types/hover'
 import { TextDocumentPositionParams, TextDocumentRegistrationOptions } from '../../protocol'
 import { Hover } from '../../protocol/plainTypes'
