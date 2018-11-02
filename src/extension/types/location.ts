@@ -1,7 +1,7 @@
 import * as sourcegraph from 'sourcegraph'
+import { URI } from '../../shared/uri'
 import { Position } from './position'
 import { Range } from './range'
-import { URI } from './uri'
 
 export class Location implements sourcegraph.Location {
     public static isLocation(thing: any): thing is sourcegraph.Location {

@@ -1,8 +1,8 @@
+import { URI } from '../../shared/uri'
 import { assertToJSON } from './common.test'
 import { Location } from './location'
 import { Position } from './position'
 import { Range } from './range'
-import { URI } from './uri'
 
 describe('Location', () => {
     it('toJSON', () => {

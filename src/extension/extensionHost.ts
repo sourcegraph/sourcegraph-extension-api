@@ -3,6 +3,7 @@ import * as sourcegraph from 'sourcegraph'
 import { createProxy, handleRequests } from '../common/proxy'
 import { Connection, createConnection, Logger, MessageTransports } from '../protocol/jsonrpc2/connection'
 import { createWebWorkerMessageTransports } from '../protocol/jsonrpc2/transports/webWorker'
+import { URI } from '../shared/uri'
 import { ExtCommands } from './api/commands'
 import { ExtConfiguration } from './api/configuration'
 import { ExtContext } from './api/context'
@@ -15,7 +16,6 @@ import { Location } from './types/location'
 import { Position } from './types/position'
 import { Range } from './types/range'
 import { Selection } from './types/selection'
-import { URI } from './types/uri'
 
 const consoleLogger: Logger = {
     error(message: string): void {

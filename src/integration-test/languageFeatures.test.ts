@@ -4,8 +4,8 @@ import * as sourcegraph from 'sourcegraph'
 import { languages as sourcegraphLanguages } from 'sourcegraph'
 import { Controller } from '../client/controller'
 import { assertToJSON } from '../extension/types/common.test'
-import { URI } from '../extension/types/uri'
 import { Definition } from '../protocol/plainTypes'
+import { URI } from '../shared/uri'
 import { createBarrier, integrationTestContext } from './helpers.test'
 
 describe('LanguageFeatures (integration)', () => {
