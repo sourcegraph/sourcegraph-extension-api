@@ -8,7 +8,9 @@ import { ExtCommands } from './api/commands'
 import { ExtConfiguration } from './api/configuration'
 import { ExtContext } from './api/context'
 import { ExtDocuments } from './api/documents'
+import { ExtFileSystem } from './api/fileSystem'
 import { ExtLanguageFeatures } from './api/languageFeatures'
+import { ExtRoots } from './api/roots'
 import { ExtSearch } from './api/search'
 import { ExtViews } from './api/views'
 import { ExtWindows } from './api/windows'
@@ -81,6 +83,12 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
     const documents = new ExtDocuments(sync)
     handleRequests(connection, 'documents', documents)
 
+    const roots = new ExtRoots()
+    handleRequests(connection, 'roots', roots)
+
+    const fileSystem = new ExtFileSystem(proxy('fileSystem'))
+    handleRequests(connection, 'fileSystem', fileSystem)
+
     const windows = new ExtWindows(proxy('windows'), proxy('codeEditor'), documents)
     handleRequests(connection, 'windows', windows)
 
@@ -109,6 +117,12 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
             PlainText: sourcegraph.MarkupKind.PlainText,
             Markdown: sourcegraph.MarkupKind.Markdown,
         },
+        FileType: {
+            Unknown: sourcegraph.FileType.Unknown,
+            File: sourcegraph.FileType.File,
+            Directory: sourcegraph.FileType.Directory,
+            SymbolicLink: sourcegraph.FileType.SymbolicLink,
+        },
 
         app: {
             get activeWindow(): sourcegraph.Window | undefined {
@@ -125,6 +139,11 @@ function createExtensionHandle(initData: InitData, connection: Connection): type
                 return documents.getAll()
             },
             onDidOpenTextDocument: documents.onDidOpenTextDocument,
+            fileSystem,
+            get roots(): ReadonlyArray<sourcegraph.WorkspaceRoot> {
+                return roots.getAll()
+            },
+            onDidChangeRoots: roots.onDidChange,
         },
 
         configuration: {

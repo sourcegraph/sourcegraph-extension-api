@@ -619,6 +619,90 @@ declare module 'sourcegraph' {
     }
 
     /**
+     * The possible types of a file in a {@link FileSystem}.
+     */
+    export const enum FileType {
+        /** The file type is unknown. */
+        Unknown = 0,
+
+        /** A regular file. */
+        File = 1,
+
+        /** A directory. */
+        Directory = 2,
+
+        /** A symbolic link. */
+        SymbolicLink = 64,
+    }
+
+    /**
+     * A file system exposes common file operations on files and directories. It uses URIs instead of file paths.
+     *
+     * @todo Add a way to list all files matching a glob (to reduce network roundtrips).
+     */
+    export interface FileSystem {
+        /**
+         * List all entries in a directory.
+         *
+         * @todo Distinguish between the types of thrown errors.
+         *
+         * @param uri The URI of the directory.
+         * @return An array of [name, type] tuples for the directory's entries.
+         * @throws If the directory is unable to be read.
+         */
+        readDirectory(uri: URI): Promise<[string, FileType][]>
+
+        /**
+         * Read the contents of a file.
+         *
+         * @todo Distinguish between the types of thrown errors.
+         *
+         * @param uri The URI of the file.
+         * @return An array of bytes.
+         * @throws If the file is unable to be read.
+         */
+        readFile(uri: URI): Promise<Uint8Array>
+    }
+
+    /**
+     * A root directory (of the {@link workspace}). This is typically the root directory of a repository.
+     */
+    export interface WorkspaceRoot {
+        /**
+         * The URI of the root.
+         *
+         * @example git+https://github.com/sourcegraph/sourcegraph/mybranch/mydir/myfile.txt
+         */
+        readonly uri: URI
+
+        /**
+         * Information about the repository that contains the root, if any.
+         *
+         * @todo Document what happens when the root is a subdirectory of a repository.
+         */
+        readonly repository?: {
+            /**
+             * The fully qualified name of the repository (as seen by Sourcegraph).
+             *
+             * This is equivalent to Repository.name in the Sourcegraph GraphQL API schema.
+             *
+             * By convention, this is often the hostname and path of the repository, such as
+             * "github.com/owner/repo". However, it is possible to configure Sourcegraph to use any name for any
+             * repository, so the format of a repository name should be treated as an opaque (but human-readable)
+             * value.
+             */
+            readonly name: string
+
+            /**
+             * A stable identifier for this repository on Sourcegraph. This value is opaque and not human readable.
+             *
+             * This is equivalent to Repository.id in the Sourcegraph GraphQL API schema.
+             */
+            readonly id: string
+        }
+    }
+
+    /**
      * The logical workspace that the extension is running in, which may consist of multiple folders, projects, and
      * repositories.
      */
@@ -634,6 +718,26 @@ declare module 'sourcegraph' {
          * An event that is fired when a new text document is opened.
          */
         export const onDidOpenTextDocument: Subscribable<TextDocument>
+
+        /**
+         * A {@link FileSystem} that exposes access to the contents of files and directories in the workspace roots
+         * (and, if available, at other URIs that are resolvable).
+         */
+        export const fileSystem: FileSystem
+
+        /**
+         * The root directories of the workspace, if any.
+         *
+         * @example The repository that is currently being viewed is a root.
+         * @todo Currently only a single root is supported.
+         * @readonly
+         */
+        export const roots: ReadonlyArray<WorkspaceRoot>
+
+        /**
+         * An event that is fired when a workspace root is added or removed from the workspace.
+         */
+        export const onDidChangeRoots: Subscribable<void>
     }
 
     /**

@@ -1,11 +1,13 @@
 import { filter, first } from 'rxjs/operators'
 import * as sourcegraph from 'sourcegraph'
+import { TextEncoder } from 'util'
 import { Controller } from '../client/controller'
 import { Environment } from '../client/environment'
 import { createExtensionHost } from '../extension/extensionHost'
 import { createMessageTransports } from '../protocol/jsonrpc2/helpers.test'
 
 const FIXTURE_ENVIRONMENT: Environment = {
+    roots: [{ uri: 'file:///' }],
     visibleTextDocuments: [
         {
             uri: 'file:///f',
@@ -38,6 +40,7 @@ export async function integrationTestContext(): Promise<
 
     const clientController = new Controller({
         clientOptions: () => ({ createMessageTransports: () => clientTransports }),
+        getFileSystem: () => memoryFileSystem({ 'file:///f': 't' }),
     })
     clientController.setEnvironment(FIXTURE_ENVIRONMENT)
 
@@ -78,6 +81,39 @@ export async function integrationTestContext(): Promise<
             return value
         },
         ready: ready({ clientController, extensionHost }),
+    }
+}
+
+/**
+ * Creates a new implementation of {@link sourcegraph.FileSystem} backed by an object whose keys are URIs and whose
+ * values are the file contents.
+ *
+ * @todo Support nested file systems.
+ *
+ * @param data An object of URI to file contents. All entries are treated as files, and no hierarchy is supported.
+ */
+export function memoryFileSystem(data: { [uri: string]: string }): sourcegraph.FileSystem {
+    data = data || {}
+    return {
+        readDirectory: dir =>
+            Promise.resolve(
+                Object.keys(data).map(
+                    // HACK: Can't use sourcegraph.FileType.File value or else it complains "Cannot find module
+                    // 'sourcegraph'".
+                    uri =>
+                        [uri.toString().replace(dir.toString(), ''), 1 as sourcegraph.FileType.File] as [
+                            string,
+                            sourcegraph.FileType
+                        ]
+                )
+            ),
+        readFile: uri => {
+            const contents = data[uri.toString()]
+            if (contents === undefined) {
+                throw new Error(`file not found: ${uri}`)
+            }
+            return Promise.resolve(new TextEncoder().encode(contents))
+        },
     }
 }
 

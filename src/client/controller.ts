@@ -1,6 +1,6 @@
 import { BehaviorSubject, Observable, Subject, Subscription, Unsubscribable } from 'rxjs'
 import { distinctUntilChanged, map } from 'rxjs/operators'
-import { ContextValues } from 'sourcegraph'
+import { ContextValues, FileSystem } from 'sourcegraph'
 import {
     ConfigurationCascade,
     ConfigurationUpdateParams,
@@ -18,7 +18,9 @@ import { ClientCommands } from './api/commands'
 import { ClientConfiguration } from './api/configuration'
 import { ClientContext } from './api/context'
 import { ClientDocuments } from './api/documents'
+import { ClientFileSystem } from './api/fileSystem'
 import { ClientLanguageFeatures } from './api/languageFeatures'
+import { ClientRoots } from './api/roots'
 import { Search } from './api/search'
 import { ClientViews } from './api/views'
 import { ClientWindows } from './api/windows'
@@ -67,6 +69,11 @@ export interface ControllerOptions<X extends Extension, C extends ConfigurationC
      * Called before applying the next environment in Controller#setEnvironment. It should have no side effects.
      */
     environmentFilter?: (nextEnvironment: Environment<X, C>) => Environment<X, C>
+
+    /**
+     * Called to obtain a {@link module:sourcegraph.FileSystem} to access the file system for a URI.
+     */
+    getFileSystem: (uri: string) => FileSystem
 }
 
 /**
@@ -273,6 +280,16 @@ export class Controller<X extends Extension, C extends ConfigurationCascade> imp
         )
         subscription.add(new Search(client, this.registries.queryTransformer))
         subscription.add(new ClientCommands(client, this.registries.commands))
+        subscription.add(
+            new ClientRoots(
+                client,
+                this.environment.pipe(
+                    map(({ roots }) => roots),
+                    distinctUntilChanged()
+                )
+            )
+        )
+        subscription.add(new ClientFileSystem(client, this.options.getFileSystem))
     }
 
     public set trace(value: Trace) {
