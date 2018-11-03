@@ -10,20 +10,88 @@ declare module 'sourcegraph' {
         unsubscribe(): void
     }
 
+    /**
+     * A uniform resource identifier (URI), as defined in [RFC
+     * 3986](https://tools.ietf.org/html/rfc3986#section-3).
+     *
+     * This URI implementation is preferred because the browser URL class implements the WHATWG URL spec, which
+     * requires special treatment for certain URI schemes (such as http and https). That special treatment is
+     * undesirable for Sourcegraph extensions, which need to treat URIs from any scheme in the same way.
+     */
     export class URI {
+        /**
+         * Parses a URI from its string representation.
+         */
         static parse(value: string): URI
-        static file(path: string): URI
 
-        constructor(value: string)
+        /**
+         * Use {@link URI.parse} or {@link URI.fromJSON} to create {@link URI} instances.
+         */
+        private constructor(args: never)
 
+        /**
+         * The scheme component of the URI.
+         *
+         * @summary `https` in `https://example.com`
+         * @see [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3)
+         */
+        readonly scheme: string
+
+        /**
+         * The authority component of the URI.
+         *
+         * @summary `example.com:1234` in `https://example.com:1234/a/b`
+         * @see [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3)
+         */
+        readonly authority: string
+
+        /**
+         * The path component of the URI.
+         *
+         * @summary `/a/b` in `https://example.com/a/b`
+         * @see [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3)
+         */
+        readonly path: string
+
+        /**
+         * The query component of the URI.
+         *
+         * @summary `b=c&d=e` in `https://example.com/a?b=c&d=e`
+         * @see [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3)
+         */
+        readonly query: string
+
+        /**
+         * The fragment component of the URI.
+         *
+         * @summary `g` in `https://example.com/a#g`
+         * @see [RFC 3986](https://tools.ietf.org/html/rfc3986#section-3)
+         */
+        readonly fragment: string
+
+        /**
+         * Derives a new URI from this URI.
+         *
+         * @returns A copy of the URI with the changed components.
+         */
+        with(change: { scheme?: string; authority?: string; path?: string; query?: string; fragment?: string }): URI
+
+        /**
+         * Returns the string representation of this URI.
+         */
         toString(): string
 
         /**
-         * Returns a JSON representation of this Uri.
+         * Returns a JSON representation of this URI.
          *
          * @return An object.
          */
         toJSON(): any
+
+        /**
+         * Revives the URI from its JSON representation that was produced with {@link URI#toJSON}.
+         */
+        static fromJSON(value: any): URI
     }
 
     export class Position {

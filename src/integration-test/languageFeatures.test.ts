@@ -31,7 +31,7 @@ describe('LanguageFeatures (integration)', () => {
         extensionHost => extensionHost.languages.registerDefinitionProvider,
         label =>
             ({
-                provideDefinition: (doc, pos) => [{ uri: new URI(`file:///${label}`) }],
+                provideDefinition: (doc, pos) => [{ uri: URI.parse(`file:///${label}`) }],
             } as sourcegraph.DefinitionProvider),
         labeledDefinitionResults,
         run => ({ provideDefinition: run } as sourcegraph.DefinitionProvider),
@@ -46,7 +46,7 @@ describe('LanguageFeatures (integration)', () => {
         extensionHost => extensionHost.languages.registerTypeDefinitionProvider,
         label =>
             ({
-                provideTypeDefinition: (doc, pos) => [{ uri: new URI(`file:///${label}`) }],
+                provideTypeDefinition: (doc, pos) => [{ uri: URI.parse(`file:///${label}`) }],
             } as sourcegraph.TypeDefinitionProvider),
         labeledDefinitionResults,
         run => ({ provideTypeDefinition: run } as sourcegraph.TypeDefinitionProvider),
@@ -61,7 +61,7 @@ describe('LanguageFeatures (integration)', () => {
         extensionHost => extensionHost.languages.registerImplementationProvider,
         label =>
             ({
-                provideImplementation: (doc, pos) => [{ uri: new URI(`file:///${label}`) }],
+                provideImplementation: (doc, pos) => [{ uri: URI.parse(`file:///${label}`) }],
             } as sourcegraph.ImplementationProvider),
         labeledDefinitionResults,
         run => ({ provideImplementation: run } as sourcegraph.ImplementationProvider),
@@ -76,7 +76,7 @@ describe('LanguageFeatures (integration)', () => {
         extensionHost => extensionHost.languages.registerReferenceProvider,
         label =>
             ({
-                provideReferences: (doc, pos, context) => [{ uri: new URI(`file:///${label}`) }],
+                provideReferences: (doc, pos, context) => [{ uri: URI.parse(`file:///${label}`) }],
             } as sourcegraph.ReferenceProvider),
         labels => labels.map(label => ({ uri: `file:///${label}`, range: undefined })),
         run => ({ provideReferences: run } as sourcegraph.ReferenceProvider),
