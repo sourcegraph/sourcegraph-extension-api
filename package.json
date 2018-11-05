@@ -89,6 +89,6 @@
     "tslint": "^5.10.0",
     "tslint-language-service": "^0.9.9",
     "typescript": "^3.0.3",
-    "typescript-json-schema": "^0.32.0"
+    "typescript-json-schema": "^0.33.0"
   }
 }
