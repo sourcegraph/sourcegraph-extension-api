@@ -1,4 +1,6 @@
-# Sourcegraph extension API ⚠️ moved to https://github.com/sourcegraph/sourcegraph/tree/master/packages/sourcegraph-extension-api ⚠️
+# Sourcegraph extension API
+
+⚠️ moved to https://github.com/sourcegraph/sourcegraph/tree/master/packages/sourcegraph-extension-api ⚠️
 
 [![build](https://travis-ci.org/sourcegraph/sourcegraph-extension-api.svg?branch=master)](https://travis-ci.org/sourcegraph/sourcegraph-extension-api)
 [![codecov](https://codecov.io/gh/sourcegraph/sourcegraph-extension-api/branch/master/graph/badge.svg?token=SLtdKY3zQx)](https://codecov.io/gh/sourcegraph/sourcegraph-extension-api)
