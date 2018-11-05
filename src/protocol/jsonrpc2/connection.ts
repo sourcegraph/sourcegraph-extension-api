@@ -154,7 +154,7 @@ function _createConnection(transports: MessageTransports, logger: Logger, strate
     let starNotificationHandler: StarNotificationHandler | undefined
     const notificationHandlers: { [name: string]: NotificationHandlerElement | undefined } = Object.create(null)
 
-    let timer: NodeJS.Timer | undefined
+    let timer: NodeJS.Timer | NodeJS.Immediate | undefined
     let messageQueue: MessageQueue = new LinkedMap<string, Message>()
     let responsePromises: { [name: string]: ResponsePromise } = Object.create(null)
     let requestTokens: { [id: string]: CancellationTokenSource } = Object.create(null)
@@ -661,7 +661,7 @@ function _createConnection(transports: MessageTransports, logger: Logger, strate
 }
 
 /** Support browser and node environments without needing a transpiler. */
-function setImmediateCompat(f: () => void): NodeJS.Timer {
+function setImmediateCompat(f: () => void): NodeJS.Timer | NodeJS.Immediate {
     if (typeof setImmediate !== 'undefined') {
         return setImmediate(f)
     }
